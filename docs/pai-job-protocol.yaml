@@ -40,6 +40,7 @@ secrets: # Optional, can be omitted.
   <secret2>: key # Can be referenced by `<% $secrets.secret1 %>`, `<% $secrets.secret2 %>`.
 
 jobRetryCount: Integer, optional # Default is 0.
+jobPriorityClass: Enum{PROD, TEST, etc}, required  # Hived job priority
 # Task roles are different types of task in the protocol.
 # One job may have one or more task roles, each task role has one or more instances, and each instance runs inside one container.
 taskRoles:
@@ -63,6 +64,8 @@ taskRoles:
       cpu: Integer, required # CPU number, unit is CPU vcore
       memoryMB: Integer, required # Memory number, unit is MB
       gpu: Integer, required # GPU number, unit is GPU card
+      gpuType/reservationId: String, required  # Hived choose preferred GPU by this
+      affinityGroupName: String, optional   # TaskRoles under the same affinityGroup will be scheduled to the same cell.
       ports: # Optional
         <portLabel>: Integer, required, minimum number is 1 # Port number for the port label. Only for host network, portLabel string in ^[A-Za-z0-9\-._~]+$ format.
     commands:
