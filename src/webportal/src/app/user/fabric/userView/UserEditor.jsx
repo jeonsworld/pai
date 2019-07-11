@@ -16,7 +16,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import React, {useRef, useContext, useState, useEffect} from 'react';
-import {Modal, TextField, FontClassNames, PrimaryButton, DefaultButton, Stack, StackItem, Checkbox, Dropdown, mergeStyles, getTheme} from 'office-ui-fabric-react';
+import {Modal, TextField, FontClassNames, PrimaryButton, DefaultButton, Stack, StackItem, Checkbox, Dropdown, mergeStyles, getTheme, ComboBox} from 'office-ui-fabric-react';
 import PropTypes from 'prop-types';
 import {isEmpty, isEqual} from 'lodash';
 import c from 'classnames';
@@ -204,6 +204,31 @@ export default function UserEditor({user: {username = '', admin = false, email =
 
   const {spacing} = getTheme();
 
+  const onResolveOptions = (options) => {
+    return [];
+  };
+
+  const onFocus = () =>{
+    console.log('onFocus');
+    const comboState = passwordRef.current.state;
+    if (comboState.selectedIndices.length == 0) {
+      passwordRef.current.focus(true);
+    } else {
+      if (!comboState.currentOptions[comboState.selectedIndices[0]].text) {
+        passwordRef.current.focus(true);
+      }
+    }
+  };
+
+
+  const onFlur = () =>{
+    console.log('onFlur');
+  };
+
+  const initOptions = [
+    {key: 'aa', text: '111111'},
+  ];
+
   return (
     <Modal
       isOpen={isOpen}
@@ -237,10 +262,17 @@ export default function UserEditor({user: {username = '', admin = false, email =
                     Password
                   </td>
                   <td className={tdPaddingStyle}>
-                    <TextField
+                    <ComboBox
                       id={`PasswordInput${Math.random()}`}
                       componentRef={passwordRef}
                       placeholder={isCreate ? 'Enter password' : '******'}
+                      options={initOptions}
+                      allowFreeform={true}
+                      autoComplete={false}
+                      useComboBoxAsMenuWidth={true}
+                      onFocus={onFocus}
+                      onFlur={onFlur}
+                      // onResolveOptions={onResolveOptions}
                     />
                   </td>
                 </tr>

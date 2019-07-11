@@ -183,6 +183,8 @@ export default function UserView() {
     setBatchVirtualClustersEditor({isOpen: false});
   };
 
+  useEffect(addUser, []);
+
   const context = {
     allUsers,
     refreshAllUsers,
