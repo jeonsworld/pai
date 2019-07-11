@@ -102,8 +102,8 @@ export default function BatchPasswordEditor({isOpen = false, hide}) {
                   </td>
                   <td className={tdPaddingStyle} style={{minWidth: '280px'}}>
                     <TextField
+                      id={`PasswordInput${Math.random()}`}
                       componentRef={passwordRef}
-                      type='password'
                       placeholder='Enter password'
                     />
                   </td>

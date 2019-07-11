@@ -224,6 +224,7 @@ export default function UserEditor({user: {username = '', admin = false, email =
                 </td>
                   <td className={tdPaddingStyle} style={{minWidth: '280px'}}>
                     <TextField
+                      id={`NameInput${Math.random()}`}
                       componentRef={usernameRef}
                       disabled={!isCreate}
                       defaultValue={username}
@@ -237,10 +238,9 @@ export default function UserEditor({user: {username = '', admin = false, email =
                   </td>
                   <td className={tdPaddingStyle}>
                     <TextField
+                      id={`PasswordInput${Math.random()}`}
                       componentRef={passwordRef}
-                      type='password'
                       placeholder={isCreate ? 'Enter password' : '******'}
-                      autoComplete='new-password'
                     />
                   </td>
                 </tr>
@@ -250,10 +250,10 @@ export default function UserEditor({user: {username = '', admin = false, email =
                   </td>
                   <td className={tdPaddingStyle}>
                     <TextField
+                      id={`EmailInput${Math.random()}`}
                       componentRef={emailRef}
                       defaultValue={email}
                       placeholder='Enter email'
-                      autoComplete='new-password'
                     />
                   </td>
                 </tr>
