@@ -24,6 +24,7 @@ import t from '../../../components/tachyons.scss';
 
 import {createUserRequest, updateUserPasswordRequest, updateUserAdminRequest, updateUserEmailRequest, updateUserVcRequest} from '../conn';
 import {checkUsername, checkPassword, checkEmail} from '../utils';
+import CustomPassword from '../components/CustomPassword';
 
 import Context from './Context';
 
@@ -224,6 +225,7 @@ export default function UserEditor({user: {username = '', admin = false, email =
                 </td>
                   <td className={tdPaddingStyle} style={{minWidth: '280px'}}>
                     <TextField
+                      id={`NameInput${Math.random()}`}
                       componentRef={usernameRef}
                       disabled={!isCreate}
                       defaultValue={username}
@@ -236,11 +238,9 @@ export default function UserEditor({user: {username = '', admin = false, email =
                     Password
                   </td>
                   <td className={tdPaddingStyle}>
-                    <TextField
+                    <CustomPassword
                       componentRef={passwordRef}
-                      type='password'
                       placeholder={isCreate ? 'Enter password' : '******'}
-                      autoComplete='new-password'
                     />
                   </td>
                 </tr>
@@ -250,10 +250,10 @@ export default function UserEditor({user: {username = '', admin = false, email =
                   </td>
                   <td className={tdPaddingStyle}>
                     <TextField
+                      id={`EmailInput${Math.random()}`}
                       componentRef={emailRef}
                       defaultValue={email}
                       placeholder='Enter email'
-                      autoComplete='new-password'
                     />
                   </td>
                 </tr>
