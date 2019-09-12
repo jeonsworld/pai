@@ -7,6 +7,8 @@
 import { injectable } from 'inversify';
 import * as vscode from 'vscode';
 
+import { IJobInfo } from 'openpai-js-sdk';
+
 import {
     COMMAND_LIST_JOB, COMMAND_OPEN_DASHBOARD, COMMAND_TREEVIEW_OPEN_PORTAL, COMMAND_VIEW_JOB
 } from '../common/constants';
@@ -17,7 +19,7 @@ import { Util } from '../common/util';
 import { getClusterName, ClusterManager } from './clusterManager';
 import { ClusterExplorerChildNode } from './configurationTreeDataProvider';
 import { ClusterNode } from './container/jobListTreeView';
-import { IPAICluster, IPAIJobInfo } from './paiInterface';
+import { IPAICluster } from './paiInterface';
 import { PAIWebPortalUri } from './paiUri';
 
 const paiDashboardPropertyLabelMapping: { [propertyName: string]: string } = {
@@ -100,7 +102,7 @@ export class PAIWebpages extends Singleton {
         await Util.openExternally(url);
     }
 
-    public async viewJob(jobInfo: IPAIJobInfo, config: IPAICluster): Promise<void> {
+    public async viewJob(jobInfo: IJobInfo, config: IPAICluster): Promise<void> {
         const url: string = await PAIWebPortalUri.jobDetail(config, jobInfo.username, jobInfo.name);
         await Util.openExternally(url);
     }

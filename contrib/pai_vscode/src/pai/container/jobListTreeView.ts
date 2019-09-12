@@ -12,6 +12,8 @@ import {
     TreeItem, TreeItemCollapsibleState, TreeView, WorkspaceConfiguration
 } from 'vscode';
 
+import { IJobInfo } from 'openpai-js-sdk';
+
 import {
     COMMAND_CONTAINER_JOBLIST_MORE, COMMAND_CONTAINER_JOBLIST_REFRESH,
     COMMAND_TREEVIEW_DOUBLECLICK, COMMAND_VIEW_JOB,
@@ -36,7 +38,7 @@ import { __ } from '../../common/i18n';
 import { getSingleton, Singleton } from '../../common/singleton';
 import { Util } from '../../common/util';
 import { getClusterName, ClusterManager } from '../clusterManager';
-import { IPAICluster, IPAIJobInfo } from '../paiInterface';
+import { IPAICluster } from '../paiInterface';
 import { PAIRestUri } from '../paiUri';
 import { RecentJobManager } from '../recentJobManager';
 
@@ -62,7 +64,7 @@ enum TreeDataType {
  * Leaf node representing job on PAI
  */
 export class JobNode extends TreeItem {
-    private static statusIcons: { [status in IPAIJobInfo['state']]: string | undefined } = {
+    private static statusIcons: { [status in IJobInfo['state']]: string | undefined } = {
         SUCCEEDED: ICON_OK,
         FAILED: ICON_ERROR,
         WAITING: ICON_QUEUE,
@@ -71,7 +73,7 @@ export class JobNode extends TreeItem {
         UNKNOWN: undefined
     };
 
-    public constructor(jobInfo: IPAIJobInfo, config: IPAICluster) {
+    public constructor(jobInfo: IJobInfo, config: IPAICluster) {
         super(jobInfo.name);
         this.command = {
             title: __('treeview.joblist.view'),
@@ -136,7 +138,7 @@ interface IClusterData {
     index: number;
     shownAmount: number;
     loadingState: LoadingState;
-    jobs: IPAIJobInfo[];
+    jobs: IJobInfo[];
     lastShownAmount?: number;
 }
 
@@ -148,7 +150,7 @@ interface IFilterData {
 
 interface IJobData {
     type: TreeDataType.Job;
-    job: IPAIJobInfo;
+    job: IJobInfo;
     clusterIndex: number;
     filterType: FilterType;
 }
@@ -256,7 +258,7 @@ export class JobListTreeDataProvider extends Singleton implements TreeDataProvid
                     const recentJobs: string[] | undefined = (await getSingleton(RecentJobManager)).allRecentJobs[cluster.index] || [];
                     const result: IJobData[] = [];
                     for (const name of recentJobs.slice(0, recentMaxLen)) {
-                        const foundJob: IPAIJobInfo | undefined = cluster.jobs.find(job => job.name === name);
+                        const foundJob: IJobInfo | undefined = cluster.jobs.find(job => job.name === name);
                         if (foundJob) {
                             result.push({
                                 type: TreeDataType.Job,
@@ -307,7 +309,7 @@ export class JobListTreeDataProvider extends Singleton implements TreeDataProvid
     }
 
     public async revealLatestJob(clusterIndex: number, jobName: string): Promise<void> {
-        const job: IPAIJobInfo | undefined = this.clusters[clusterIndex].jobs.find(j => j.name === jobName);
+        const job: IJobInfo | undefined = this.clusters[clusterIndex].jobs.find(j => j.name === jobName);
         if (job) {
             /**
              * Note: treeView.reveal() will obtain the node's parent and

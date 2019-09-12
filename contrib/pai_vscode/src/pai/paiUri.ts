@@ -24,7 +24,7 @@ export namespace PAIRestUri {
     }
 
     export function getRestUrlWithApiPrefix(cluster: IPAICluster, apiPrefix: string): string {
-        let url: string = cluster.rest_server_uri;
+        let url: string = cluster.rest_server_uri!;
         if (!url.endsWith('/')) {
             url += '/';
         }
@@ -57,7 +57,7 @@ export namespace PAIRestUri {
 
 export namespace PAIWebPortalUri {
     export function getClusterWebPortalUri(conf: IPAICluster): string {
-        return conf.web_portal_uri || conf.rest_server_uri.split(':')[0];
+        return conf.web_portal_uri || conf.rest_server_uri!.split(':')[0];
     }
 
     export async function isOldJobLinkAvailable(cluster: IPAICluster): Promise<boolean> {

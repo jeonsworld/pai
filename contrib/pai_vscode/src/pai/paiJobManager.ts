@@ -16,6 +16,8 @@ import * as request from 'request-promise-native';
 import * as uuid from 'uuid';
 import * as vscode from 'vscode';
 
+import { IJobConfig as IJobConfigV2, IJobConfigV1 } from 'openpai-js-sdk';
+
 import {
     COMMAND_CREATE_JOB_CONFIG,
     COMMAND_CREATE_JOB_CONFIG_V1,
@@ -38,7 +40,7 @@ import { Util } from '../common/util';
 import { getClusterIdentifier, ClusterManager } from './clusterManager';
 import { ClusterExplorerChildNode } from './configurationTreeDataProvider';
 import { getHDFSUriAuthority, HDFS, HDFSFileSystemProvider } from './hdfs';
-import { IPAICluster, IPAIJobConfigV1, IPAIJobConfigV2, IPAITaskRole } from './paiInterface';
+import { IPAICluster } from './paiInterface';
 
 import opn = require('opn'); // tslint:disable-line
 import unixify = require('unixify'); // tslint:disable-line
@@ -53,7 +55,7 @@ interface ITokenItem {
 }
 
 interface IJobParam {
-    config: IPAIJobConfigV1;
+    config: IJobConfigV1;
     cluster?: IPAICluster;
     workspace: string;
     upload?: {
@@ -75,7 +77,7 @@ interface IJobInput {
 export class PAIJobManager extends Singleton {
     private static readonly TIMEOUT: number = 60 * 1000;
     private static readonly SIMULATION_DOCKERFILE_FOLDER: string = '.pai_simulator';
-    private static readonly propertiesToBeReplaced: (keyof IPAIJobConfigV1)[] = [
+    private static readonly propertiesToBeReplaced: (keyof IJobConfigV1)[] = [
         'codeDir',
         'outputDir',
         'dataDir',
@@ -159,7 +161,7 @@ export class PAIJobManager extends Singleton {
 
     public static async generateJobConfigV1(script?: string): Promise<void> {
         let defaultSaveDir: string;
-        let config: IPAIJobConfigV1 | undefined;
+        let config: IJobConfigV1 | undefined;
         if (!script) {
             const folders: vscode.WorkspaceFolder[] | undefined = vscode.workspace.workspaceFolders;
             let parent: string = os.homedir();
@@ -264,7 +266,7 @@ export class PAIJobManager extends Singleton {
         const jobName: string = script ? path.basename(script, path.extname(script)) : 'new_job';
         const defaultSaveDir: string = path.join(parent, `${jobName}.pai.yaml`);
 
-        const config: IPAIJobConfigV2 = {
+        const config: IJobConfigV2 = {
             protocolVersion: 2,
             name: jobName,
             type: 'job',
@@ -355,14 +357,14 @@ export class PAIJobManager extends Singleton {
         return vscode.workspace.getConfiguration(SETTING_SECTION_JOB);
     }
 
-    private static replaceVariables({ cluster, config }: IJobParam): IPAIJobConfigV1 {
+    private static replaceVariables({ cluster, config }: IJobParam): IJobConfigV1 {
         // Replace environment variable
         function replaceVariable(x: string): string {
             return x.replace('$PAI_JOB_NAME', config.jobName)
-                .replace('$PAI_USER_NAME', cluster!.username);
+                .replace('$PAI_USER_NAME', cluster!.username!);
         }
         for (const key of PAIJobManager.propertiesToBeReplaced) {
-            const old: string | IPAITaskRole[] | undefined = config[key];
+            const old: any = config[key];
             if (typeof old === 'string') {
                 config[key] = replaceVariable(old);
             }
@@ -415,7 +417,7 @@ export class PAIJobManager extends Singleton {
             param.config.jobName = `${param.config.jobName}_${uuid().substring(0, 8)}`;
         } else {
             try {
-                await request.get(PAIRestUri.jobDetail(param.cluster, param.cluster.username, param.config.jobName), {
+                await request.get(PAIRestUri.jobDetail(param.cluster, param.cluster.username!, param.config.jobName), {
                     headers: { Authorization: `Bearer ${await this.getToken(param.cluster)}` },
                     timeout: PAIJobManager.TIMEOUT,
                     json: true
@@ -470,7 +472,7 @@ export class PAIJobManager extends Singleton {
                 __('job.submission.success'),
                 open
             ).then(async res => {
-                const url: string = await PAIWebPortalUri.jobDetail(param.cluster!, param.cluster!.username, param.config.jobName);
+                const url: string = await PAIWebPortalUri.jobDetail(param.cluster!, param.cluster!.username!, param.config.jobName);
                 if (res === open) {
                     await Util.openExternally(url);
                 }
@@ -481,7 +483,7 @@ export class PAIJobManager extends Singleton {
     }
 
     private async submitJobV2(input: IJobInput = {}, statusBarItem: vscode.StatusBarItem): Promise<void> {
-        const config: IPAIJobConfigV2 = yaml.safeLoad(await fs.readFile(input.jobConfigPath!, 'utf8'));
+        const config: IJobConfigV2 = yaml.safeLoad(await fs.readFile(input.jobConfigPath!, 'utf8'));
         let cluster: IPAICluster;
 
         if (input.clusterIndex) {
@@ -499,7 +501,7 @@ export class PAIJobManager extends Singleton {
             config.name = `${config.name}_${uuid().substring(0, 8)}`;
         } else {
             try {
-                await request.get(PAIRestUri.jobDetail(cluster, cluster.username, config.name), {
+                await request.get(PAIRestUri.jobDetail(cluster, cluster.username!, config.name), {
                     headers: { Authorization: `Bearer ${await this.getToken(cluster)}` },
                     timeout: PAIJobManager.TIMEOUT,
                     json: true
@@ -546,7 +548,7 @@ export class PAIJobManager extends Singleton {
                 __('job.submission.success'),
                 open
             ).then(async res => {
-                const url: string = await PAIWebPortalUri.jobDetail(cluster!, cluster!.username, config.name);
+                const url: string = await PAIWebPortalUri.jobDetail(cluster!, cluster!.username!, config.name);
                 if (res === open) {
                     await Util.openExternally(url);
                 }
@@ -751,7 +753,7 @@ export class PAIJobManager extends Singleton {
             Util.err('job.prepare.config.yaml-not-support');
             return undefined;
         }
-        const config: IPAIJobConfigV1 = JSONC.parse(await fs.readFile(jobConfigPath!, 'utf8'));
+        const config: IJobConfigV1 = JSONC.parse(await fs.readFile(jobConfigPath!, 'utf8'));
         if (isNil(config)) {
             Util.err('job.prepare.config.invalid');
         }
