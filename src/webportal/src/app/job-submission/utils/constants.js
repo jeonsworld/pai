@@ -116,5 +116,5 @@ export const DOCKER_OPTIONS = [
     image: 'enlipleai/tf:19.10.1',
   },
 ];
-export const DEFAULT_DOCKER_URI = 'enlipleai/tf:19.10.1';
+export const DEFAULT_DOCKER_URI = 'enlipleai/pytorch:19.10.1';
 
