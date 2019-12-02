@@ -1,0 +1,30 @@
+apt-get -y install \
+      nano \
+      vim \
+      joe \
+      wget \
+      curl \
+      jq \
+      gawk \
+      psmisc \
+      python \
+      python-yaml \
+      python-jinja2 \
+      python-urllib3 \
+      python-tz \
+      python-nose \
+      python-prettytable \
+      python-netifaces \
+      python-dev \
+      python-pip \
+      python-mysqldb \
+      openjdk-8-jre \
+      openjdk-8-jdk \
+      openssh-server \
+      openssh-client \
+      git \
+      bash-completion \
+      inotify-tools \
+      rsync \
+      net-tools \
+      python3-pip
