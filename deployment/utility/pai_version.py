@@ -23,7 +23,7 @@ def cluster_version():
 
 
 def check_cluster_version():
-    c_version = cluster_version()
+    c_version = cluster_version().strip()
     p_version = paictl_version()
     logger.info("Cluster version: %s, paictl version: %s", c_version, p_version)
     if p_version != c_version:
